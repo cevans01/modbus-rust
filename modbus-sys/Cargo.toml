@@ -1,0 +1,19 @@
+[package]
+name = "modbus-sys"
+version = "0.1.0"
+authors = ["Chris Evans <cevans3326@gmail.com>"]
+links = "modbus"
+build = "build.rs"
+
+[lib]
+name = "modbus_sys"
+path = "lib.rs"
+
+[dependencies]
+libc = "*"
+
+[build-dependencies]
+pkg-config = "0.3.8"
+gcc = "0.3.10"
+
+
