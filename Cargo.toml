@@ -8,3 +8,6 @@ libc = "*"
 modbus-sys = { path = "modbus-sys", version = "*" }
 
 
+[lib]
+name = "modbus"
+path = "src/lib.rs"
