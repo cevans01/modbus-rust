@@ -7,6 +7,7 @@ authors = ["Chris Evans <cevans3326@gmail.com>"]
 libc = "*"
 modbus-sys = { path = "modbus-sys", version = "*" }
 errno = "*"
+rand = "0.3"
 
 
 [lib]
