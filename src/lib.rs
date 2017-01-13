@@ -16,16 +16,18 @@ use libc::{c_uint, c_int};
 use errno::{Errno, errno};
 
 // Helpers
+pub type ModbusResult = Result<i32, Errno>;
+
 fn octets_to_str(oct : &[u8; 4]) -> String
 {
     format!("{}.{}.{}.{}", oct[0], oct[1], oct[2], oct[3])
 }
 
-fn cvt(r: c_int) -> Result<(), Errno> {
-    if r == 0 {
-        Ok(())
-    } else {
+fn cvt(r: c_int) -> ModbusResult {
+    if r == -1 {
         Err(errno())
+    } else {
+        Ok(r as i32)
     }
 }
 
@@ -136,14 +138,15 @@ impl Modbus {
 
     }
 
-    pub fn set_debug(&mut self, flag: c_int)
+    pub fn set_debug(&mut self, flag: bool)
     {
+        let flag_i: c_int = match flag { true => 1, false => 0 };
         unsafe {
-            modbus_sys::modbus_set_debug(self.handle, flag);
+            modbus_sys::modbus_set_debug(self.handle, flag_i);
         }
     }
 
-    pub fn connect(&mut self) -> Result<(), Errno>
+    pub fn connect(&mut self) -> ModbusResult
     {
         unsafe {
             let r = modbus_sys::modbus_connect(self.handle);
@@ -159,14 +162,14 @@ impl Modbus {
     }
 
     // Write / read bits
-    pub fn write_bit(&mut self, coil_addr: c_int, status: c_int) -> Result<(), Errno>
+    pub fn write_bit(&mut self, coil_addr: c_int, status: c_int) -> ModbusResult
     {
         unsafe {
             let r = modbus_sys::modbus_write_bit(self.handle, coil_addr, status);
             return cvt(r)
         }
     }
-    pub fn write_bits(&mut self, addr: c_int, data: &[u8]) -> Result<(), Errno>
+    pub fn write_bits(&mut self, addr: c_int, data: &[u8]) -> ModbusResult
     {
         unsafe {
             cvt( modbus_sys::modbus_write_bits(self.handle, addr, data.len() as c_int, data.as_ptr()) )
@@ -174,7 +177,7 @@ impl Modbus {
 
     }
 
-    pub fn read_bits(&mut self, addr: c_int, dest: &mut [u8]) -> Result<(), Errno>
+    pub fn read_bits(&mut self, addr: c_int, dest: &mut [u8]) -> ModbusResult
     {
         unsafe {
             cvt( modbus_sys::modbus_read_bits(self.handle,
@@ -185,21 +188,21 @@ impl Modbus {
     }
 
     // Write / read registers
-    pub fn write_register(&mut self, reg_addr: c_int, value: c_int) -> Result<(), Errno>
+    pub fn write_register(&mut self, reg_addr: c_int, value: c_int) -> ModbusResult
     {
         unsafe {
             cvt( modbus_sys::modbus_write_register(self.handle, reg_addr, value) )
         }
     }
 
-    pub fn write_registers(&mut self, addr: c_int, data: &[u16]) -> Result<(), Errno>
+    pub fn write_registers(&mut self, addr: c_int, data: &[u16]) -> ModbusResult
     {
         unsafe {
             cvt( modbus_sys::modbus_write_registers(self.handle, addr, data.len() as i32, data.as_ptr()) )
         }
     }
 
-    pub fn read_registers(&mut self, addr: c_int, dest: &mut [u16]) -> Result<(), Errno>
+    pub fn read_registers(&mut self, addr: c_int, dest: &mut [u16]) -> ModbusResult
     {
         unsafe {
             cvt( modbus_sys::modbus_read_registers(self.handle, addr, dest.len() as i32, dest.as_mut_ptr()) )
@@ -207,7 +210,7 @@ impl Modbus {
 
     }
 
-    pub fn read_input_registers(&mut self, addr: c_int, dest: &mut [u16]) -> Result<(), Errno>
+    pub fn read_input_registers(&mut self, addr: c_int, dest: &mut [u16]) -> ModbusResult
     {
         unsafe {
             cvt( modbus_sys::modbus_read_input_registers(self.handle, addr, dest.len() as i32, dest.as_mut_ptr()) )
@@ -215,7 +218,7 @@ impl Modbus {
     }
 
     pub fn write_and_read_registers(&mut self, write_addr: c_int, src: &[u16],
-                                           read_addr: c_int, dest: &mut [u16]) -> Result<(), Errno>
+                                           read_addr: c_int, dest: &mut [u16]) -> ModbusResult
     {
         unsafe {
             cvt( modbus_sys::modbus_write_and_read_registers(self.handle, write_addr, src.len() as i32, src.as_ptr(),
