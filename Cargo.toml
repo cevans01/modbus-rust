@@ -6,6 +6,7 @@ authors = ["Chris Evans <cevans3326@gmail.com>"]
 [dependencies]
 libc = "*"
 modbus-sys = { path = "modbus-sys", version = "*" }
+errno = "*"
 
 
 [lib]

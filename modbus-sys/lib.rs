@@ -31,6 +31,8 @@ pub enum Enum_Unnamed24 {
 }
 pub enum _modbus { }
 pub type modbus_t = _modbus;
+// Doing this one by hand
+/*
 #[repr(C)]
 #[derive(Copy, Clone)]
 #[derive(Debug)]
@@ -51,6 +53,11 @@ pub struct modbus_mapping_t {
 impl ::std::default::Default for modbus_mapping_t {
     fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
+*/
+
+pub enum modbus_mapping_e { }
+pub type modbus_mapping_t = modbus_mapping_e;
+
 #[derive(Copy, Clone)]
 #[repr(u32)]
 #[derive(Debug)]
