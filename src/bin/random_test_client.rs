@@ -68,6 +68,7 @@ pub fn main() {
     let mut nb_fail: u32 = 0;
 
     let mut tab_rp_bits = vec![0u8; nb];
+    let mut tab_rp_registers = vec![0u16; nb];
 
     for nb_loop in 0..LOOP {
         for addr in ADDRESS_START..ADDRESS_END {
@@ -84,43 +85,118 @@ pub fn main() {
 
 
             /* WRITE BIT */
-            /*
-            match mb.write_bit(addr, tab_rq_bits[0]) {
-                Ok(()) => _,
-                Err(err) =>
-            }
-            */
-            /*
-            if mb.write_bit(addr, tab_rq_bits[0] as i32).is_ok() {
+            if let Err(e) = mb.write_bit(addr, tab_rq_bits[0] as i32) {
+                println!("Error: Modbus::write_bit");
+                println!("{}", e);
+                nb_fail += 1;
             }
             else {
-
+                if let Err(e) = mb.read_bits(addr, &mut tab_rp_bits[0..1]) {
+                    println!("Error: Modbus::read_bits");
+                    println!("{}", e);
+                    nb_fail += 1;
+                }
+                else {
+                    if tab_rq_bits[0] != tab_rp_bits[0] {
+                        println!("Error: write_bit/read_bits mismatch");
+                        nb_fail += 1;
+                    }
+                }
             }
-            */
-            //log_try!( mb.write_bit(addr, tab_rq_bits[0] as i32); nb_fail );
-            //log_try!( mb.write_bit(addr, tab_rq_bits[0] as i32) );
-            //try!( mb.write_bit(addr, tab_rq_bits[0] as i32) );
-            //
-            if let Err(e) = mb.write_bit(addr, tab_rq_bits[0] as i32) {
-                println!("Error happened:");
+
+            /* MULTIPLE BITS */
+            if let Err(e) = mb.write_bits(addr, &tab_rq_bits[..]) {
+                println!("Error: Modbus::write_bits");
                 println!("{}", e);
+                nb_fail += 1;
             }
-            /*
-            if log_res( mb.write_bit(addr, tab_rq_bits[0] as i32), &mut nb_fail ).is_ok() {
-                log_res( mb.read_bits(addr, &mut tab_rp_bits[0..1]), &mut nb_fail );
+            else {
+                if let Err(e) = mb.read_bits(addr, &mut tab_rp_bits[..]) {
+                    println!("Error: Modbus::read_bits");
+                    println!("{}", e);
+                    nb_fail += 1;
+                }
+                else {
+                    for (i, item) in tab_rq_bits.iter().enumerate() {
+                        if *item != tab_rp_bits[i] {
+                            println!("Error: Modbus write_bits/read_bits: for index {}, read {}, write {}",
+                                     i, tab_rp_bits[i], item);
+                            nb_fail += 1;
+                        }
+                    }
+                }
             }
-            */
 
-            /*
-            if log_res( mb.write_bits(addr, &tab_rq_bits[..]), &mut nb_fail ).is_ok() {
-                log_res( mb.read_bits(addr, &mut tab_rp_bits[..]), &mut nb_fail );
-            }
-            */
 
+            /* SINGLE REGISTER */
+            if let Err(e) = mb.write_register(addr, tab_rq_registers[0] as i32) {
+                println!("Error: Modbus::write_register");
+                println!("{}", e);
+                nb_fail += 1;
+            }
+            else {
+                if let Err(e) = mb.read_registers(addr, &mut tab_rp_registers[0..1]) {
+                    println!("Error: Modbus::read_registers");
+                    println!("{}", e);
+                    nb_fail += 1;
+                }
+                else {
+                    if tab_rq_registers[0] != tab_rp_registers[0] {
+                        println!("Error: write_register/read_registers mismatch");
+                        nb_fail += 1;
+                    }
+                }
+            }
+
+            /* MULTIPLE REGISTERS */
+            if let Err(e) = mb.write_registers(addr, &tab_rq_registers[..]) {
+                println!("Error: Modbus::write_registers");
+                println!("{}", e);
+                nb_fail += 1;
+            }
+            else {
+                if let Err(e) = mb.read_registers(addr, &mut tab_rp_registers[..]) {
+                    println!("Error: Modbus::read_registers");
+                    println!("{}", e);
+                    nb_fail += 1;
+                }
+                else {
+                    for (i, item) in tab_rq_registers.iter().enumerate() {
+                        if *item != tab_rp_registers[i] {
+                            println!("Error: Modbus write_registers/read_registers: for index {}, read {}, write {}",
+                                     i, tab_rp_registers[i], item);
+                            nb_fail += 1;
+                        }
+                    }
+                }
+            }
+
+            /* R/W MULTIPLE REGISTERS */
+            match mb.write_and_read_registers(addr, &tab_rq_registers[..],
+                                                        addr, &mut tab_rp_registers[..]) {
+                Ok(rv) =>
+                    if rv != nb as i32 {
+                        println!("Error: Modbus::write_and_read_registers mismatch");
+                        nb_fail += 1;
+                    }
+                    else {
+                        for (i, item) in tab_rq_registers.iter().enumerate() {
+                            if *item != tab_rp_registers[i] {
+                                println!("Error: Modbus write_registers/read_registers: for index {}, read {}, write {}",
+                                         i, tab_rp_registers[i], item);
+                                nb_fail += 1;
+                            }
+                        }
+                    },
+                Err(e) =>
+                    println!("Error: Modbus::write_and_read_registers"),
+            }
         }
 
-        println!( "nb_fail is = {}", nb_fail );
-
-
+        println!("Test: ");
+        match nb_fail {
+            0 => println!("SUCCESS"),
+            x => println!("{} FAILS", x),
+        }
     }
 }
