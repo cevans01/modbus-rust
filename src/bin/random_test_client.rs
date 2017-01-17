@@ -179,4 +179,6 @@ pub fn main() {
             x => println!("{} FAILS", x),
         }
     }
+
+    mb.close();
 }
