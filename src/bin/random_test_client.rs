@@ -26,26 +26,6 @@ const SERVER_ID: i32        =   17;
 const ADDRESS_START: i32    =   0;
 const ADDRESS_END: i32      =   99;
 
-/*
-macro_rules! log_try {
-    ($e:expr,$v:ident) => (match $e {
-        Ok(val) => val,
-        Err(err) => {
-            $v += 1;
-            return Err(::std::convert::From::from(err))
-        },
-    });
-}
-*/
-/*
-macro_rules! log_try {
-    ($e:expr) => (match $e {
-        Ok(val) => val,
-        Err(err) => return Err(::std::convert::From::from(err)),
-    });
-}
-*/
-
 fn log_res( result: ModbusResult, log_var: &mut u32 ) -> ModbusResult
 {
     match result {

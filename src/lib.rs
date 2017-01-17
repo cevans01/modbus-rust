@@ -15,7 +15,6 @@ use std::net::{SocketAddrV4};
 use libc::{c_uint, c_int};
 use errno::{Errno, errno};
 
-// Helpers
 pub type ModbusResult = Result<i32, Errno>;
 
 fn octets_to_str(oct : &[u8; 4]) -> String
@@ -31,7 +30,6 @@ fn cvt(r: c_int) -> ModbusResult {
     }
 }
 
-// Free functions
 pub fn get_major_version() -> c_uint
 {
     modbus_sys::libmodbus_version_major
@@ -45,19 +43,6 @@ pub fn get_patch_version() -> c_uint
     modbus_sys::libmodbus_version_micro
 }
 
-/*
-pub fn modbus_new_tcp(ip_address: *const libc::c_char, port: libc::c_int) -> *mut modbus_sys::modbus_t
-{
-    unsafe {
-        modbus_sys::modbus_new_tcp(ip_address, port)
-    }
-}
-*/
-
-
-// STRUCTS
-//
-// ModbusMaping
 pub struct ModbusMapping {
     handle: *mut modbus_sys::modbus_mapping_t,
 }
@@ -107,7 +92,6 @@ impl Drop for ModbusMapping {
 }
 
 
-// Modbus
 pub struct Modbus {
     handle: *mut modbus_sys::modbus_t,
 }
@@ -161,7 +145,6 @@ impl Modbus {
         }
     }
 
-    // Write / read bits
     pub fn write_bit(&mut self, coil_addr: c_int, status: c_int) -> ModbusResult
     {
         unsafe {
@@ -187,7 +170,6 @@ impl Modbus {
         }
     }
 
-    // Write / read registers
     pub fn write_register(&mut self, reg_addr: c_int, value: c_int) -> ModbusResult
     {
         unsafe {
