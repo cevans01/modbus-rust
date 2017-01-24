@@ -112,6 +112,9 @@ impl Drop for ModbusMapping {
     }
 }
 
+unsafe impl Send for ModbusMapping { }
+unsafe impl Sync for ModbusMapping { }
+
 
 /// Context for modbus functions
 pub struct Modbus {
@@ -318,4 +321,7 @@ impl Drop for Modbus {
         }
     }
 }
+
+unsafe impl Send for Modbus { }
+unsafe impl Sync for Modbus { }
 
