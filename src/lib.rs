@@ -160,7 +160,7 @@ impl Modbus {
     }
 
     /// Set debug flag of the context
-    pub fn set_debug(&mut self, flag: bool)
+    pub fn set_debug(&self, flag: bool)
     {
         let flag_i: c_int = match flag { true => 1, false => 0 };
         unsafe {
@@ -169,7 +169,7 @@ impl Modbus {
     }
 
     /// Establish a connection to a Modbus server
-    pub fn connect(&mut self) -> ModbusResult
+    pub fn connect(&self) -> ModbusResult
     {
         unsafe {
             let r = modbus_sys::modbus_connect(self.handle);
@@ -180,7 +180,7 @@ impl Modbus {
     /// Close a modbus connection
     ///
     /// This should be called if you have previously called Modbus::connect
-    pub fn close(&mut self)
+    pub fn close(&self)
     {
         unsafe {
             modbus_sys::modbus_close(self.handle)
@@ -193,7 +193,7 @@ impl Modbus {
     /// value must me set to 1 or 0.
     ///
     /// The function uses the Modbus function code 0x05 (force single coil).
-    pub fn write_bit(&mut self, coil_addr: c_int, status: c_int) -> ModbusResult
+    pub fn write_bit(&self, coil_addr: c_int, status: c_int) -> ModbusResult
     {
         unsafe {
             let r = modbus_sys::modbus_write_bit(self.handle, coil_addr, status);
@@ -207,7 +207,7 @@ impl Modbus {
     /// of the remote device. The data slice must contain bytes set to 1 or 0.
     ///
     /// The function uses the Modbus function code 0x0F (force multiple coils).
-    pub fn write_bits(&mut self, addr: c_int, data: &[u8]) -> ModbusResult
+    pub fn write_bits(&self, addr: c_int, data: &[u8]) -> ModbusResult
     {
         unsafe {
             cvt( modbus_sys::modbus_write_bits(self.handle, addr, data.len() as c_int, data.as_ptr()) )
@@ -223,7 +223,7 @@ impl Modbus {
     ///
     /// The function uses the Modbus function code 0x01 (read coil status).
     ///
-    pub fn read_bits(&mut self, addr: c_int, dest: &mut [u8]) -> ModbusResult
+    pub fn read_bits(&self, addr: c_int, dest: &mut [u8]) -> ModbusResult
     {
         unsafe {
             cvt( modbus_sys::modbus_read_bits(self.handle,
@@ -240,7 +240,7 @@ impl Modbus {
     ///
     /// The function uses the Modbus function code 0x06 (preset single register).
     ///
-    pub fn write_register(&mut self, reg_addr: c_int, value: c_int) -> ModbusResult
+    pub fn write_register(&self, reg_addr: c_int, value: c_int) -> ModbusResult
     {
         unsafe {
             cvt( modbus_sys::modbus_write_register(self.handle, reg_addr, value) )
@@ -254,7 +254,7 @@ impl Modbus {
     ///
     /// The function uses the Modbus function code 0x10 (preset multiple registers).
     ///
-    pub fn write_registers(&mut self, addr: c_int, data: &[u16]) -> ModbusResult
+    pub fn write_registers(&self, addr: c_int, data: &[u16]) -> ModbusResult
     {
         unsafe {
             cvt( modbus_sys::modbus_write_registers(self.handle, addr, data.len() as i32, data.as_ptr()) )
@@ -269,7 +269,7 @@ impl Modbus {
     ///
     /// The function uses the Modbus function code 0x03 (read holding registers).
     ///
-    pub fn read_registers(&mut self, addr: c_int, dest: &mut [u16]) -> ModbusResult
+    pub fn read_registers(&self, addr: c_int, dest: &mut [u16]) -> ModbusResult
     {
         unsafe {
             cvt( modbus_sys::modbus_read_registers(self.handle, addr, dest.len() as i32, dest.as_mut_ptr()) )
@@ -287,7 +287,7 @@ impl Modbus {
     /// registers and input registers have different historical meaning, but nowadays it’s more
     /// common to use holding registers only.
     ///
-    pub fn read_input_registers(&mut self, addr: c_int, dest: &mut [u16]) -> ModbusResult
+    pub fn read_input_registers(&self, addr: c_int, dest: &mut [u16]) -> ModbusResult
     {
         unsafe {
             cvt( modbus_sys::modbus_read_input_registers(self.handle, addr, dest.len() as i32, dest.as_mut_ptr()) )
@@ -303,7 +303,7 @@ impl Modbus {
     ///
     /// The function uses the Modbus function code 0x17 (write/read registers).
     ///
-    pub fn write_and_read_registers(&mut self, write_addr: c_int, src: &[u16],
+    pub fn write_and_read_registers(&self, write_addr: c_int, src: &[u16],
                                            read_addr: c_int, dest: &mut [u16]) -> ModbusResult
     {
         unsafe {

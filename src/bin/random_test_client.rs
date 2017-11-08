@@ -37,7 +37,7 @@ fn log_res( result: ModbusResult, log_var: &mut u32 ) -> ModbusResult
 pub fn main() {
 
     let addr = "127.0.0.1:1502".parse().unwrap();
-    let mut mb = Modbus::new_tcp(&addr);
+    let mb = Modbus::new_tcp(&addr);
 
     mb.set_debug(true);
 
